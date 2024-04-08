@@ -36,7 +36,7 @@ resource "aws_subnet" "subnet1" {
 resource "aws_subnet" "subnet2" {
   vpc_id            = aws_vpc.tst_vpc.id
   cidr_block        = "10.0.2.0/24"
-  availability_zone = "us-east-1a"
+  availability_zone = "us-east-1b"
 }
 
 resource "aws_db_subnet_group" "subnet_group" {
@@ -65,7 +65,7 @@ resource "aws_db_instance" "postgres_tst" {
 
   vpc_security_group_ids = [aws_security_group.tst_sg.id]
 
-  multi_az = false
+  multi_az = true
 
   tags = {
     Name        = "MyDB"
