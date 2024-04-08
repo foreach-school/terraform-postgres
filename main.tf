@@ -49,13 +49,15 @@ resource "aws_db_parameter_group" "postgres_parameters" {
   family = "postgres14"
 
   parameter {
-    name  = "max_connections"
-    value = "100"
+    name         = "max_connections"
+    value        = "100"
+    apply_method = "pending-reboot"
   }
 
   parameter {
-    name  = "shared_buffers"
-    value = "512MB"
+    name         = "shared_buffers"
+    value        = "512MB"
+    apply_method = "pending-reboot"
   }
 }
 
@@ -79,7 +81,7 @@ resource "aws_db_instance" "postgres_tst" {
   parameter_group_name  = aws_db_parameter_group.postgres_parameters.name
 
   vpc_security_group_ids = [aws_security_group.tf_sg.id]
-  db_subnet_group_name = aws_db_subnet_group.subnet_group.name
+  db_subnet_group_name   = aws_db_subnet_group.subnet_group.name
 
   multi_az = false
 
