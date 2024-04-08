@@ -40,7 +40,7 @@ resource "aws_subnet" "subnet2" {
 }
 
 resource "aws_db_subnet_group" "subnet_group" {
-  name        = "subnet-group-tf"
+  name        = "subnet-group-terraform"
   subnet_ids  = [aws_subnet.subnet1.id, aws_subnet.subnet2.id]
 }
 
