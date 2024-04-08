@@ -27,15 +27,21 @@ resource "aws_security_group" "tst_sg" {
   }
 }
 
-resource "aws_db_subnet_group" "subnet_group" {
-  name        = "subnet-group"
-  subnet_ids  = [aws_subnet.subnet.id] 
+resource "aws_subnet" "subnet1" {
+  vpc_id            = aws_vpc.tst_vpc.id
+  cidr_block        = "10.0.1.0/24"
+  availability_zone = "us-east-1a"
 }
 
-resource "aws_subnet" "subnet" {
-  vpc_id                  = aws_vpc.tst_vpc.id
-  cidr_block              = "10.0.1.0/24"
-  availability_zone       = "us-east-1a" 
+resource "aws_subnet" "subnet2" {
+  vpc_id            = aws_vpc.tst_vpc.id
+  cidr_block        = "10.0.2.0/24"
+  availability_zone = "us-east-1b"
+}
+
+resource "aws_db_subnet_group" "subnet_group" {
+  name        = "subnet-group"
+  subnet_ids  = [aws_subnet.subnet1.id, aws_subnet.subnet2.id]
 }
 
 variable "db_password" {
@@ -51,7 +57,7 @@ resource "aws_db_instance" "postgres_tst" {
   allocated_storage     = 20
   storage_type          = "gp2"
   engine                = "postgres"
-  engine_version        = "12.6"
+  engine_version        = "14.6"
   instance_class        = "db.t2.micro"
   username              = var.db_username
   password              = var.db_password
