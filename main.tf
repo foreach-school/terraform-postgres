@@ -64,8 +64,9 @@ resource "aws_db_instance" "postgres_tst" {
   parameter_group_name  = "default.postgres12"
 
   vpc_security_group_ids = [aws_security_group.tf_sg.id]
+  db_subnet_group_name = aws_db_subnet_group.subnet_group.name
 
-  multi_az = true
+  multi_az = false
 
   tags = {
     Name        = "MyDB"
