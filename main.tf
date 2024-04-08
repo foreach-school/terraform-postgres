@@ -27,6 +27,13 @@ resource "aws_security_group" "tst_sg" {
   }
 }
 
+resource "aws_subnet" "default_subnet" {
+  vpc_id            = aws_vpc.tst_vpc.id
+  cidr_block        = "10.0.1.0/24"
+  availability_zone = "us-east-1a"
+  map_public_ip_on_launch = true 
+}
+
 resource "aws_subnet" "subnet1" {
   vpc_id            = aws_vpc.tst_vpc.id
   cidr_block        = "10.0.1.0/24"
@@ -40,7 +47,7 @@ resource "aws_subnet" "subnet2" {
 }
 
 resource "aws_db_subnet_group" "subnet_group" {
-  name        = "subnet-group"
+  name        = "subnet-group-tst"
   subnet_ids  = [aws_subnet.subnet1.id, aws_subnet.subnet2.id]
 }
 
