@@ -44,7 +44,7 @@ resource "aws_db_subnet_group" "subnet_group" {
   subnet_ids  = [aws_subnet.subnet1.id, aws_subnet.subnet2.id]
 }
 
-resource "aws_db_parameter_group" "postgres_parameters" {
+/*resource "aws_db_parameter_group" "postgres_parameters" {
   name   = "postgres-parameters"
   family = "postgres14"
 
@@ -59,7 +59,7 @@ resource "aws_db_parameter_group" "postgres_parameters" {
     value        = "512MB"
     apply_method = "pending-reboot"
   }
-}
+}*/
 
 variable "db_password" {
   description = "Password for the database"
@@ -78,7 +78,7 @@ resource "aws_db_instance" "postgres_tst" {
   instance_class        = "db.t3.small"
   username              = var.db_username
   password              = var.db_password
-  parameter_group_name  = aws_db_parameter_group.postgres_parameters.name
+  parameter_group_name  = postgres_parameters #aws_db_parameter_group.postgres_parameters.name
 
   vpc_security_group_ids = [aws_security_group.tf_sg.id]
   db_subnet_group_name   = aws_db_subnet_group.subnet_group.name
