@@ -53,14 +53,11 @@ resource "aws_db_instance" "postgres_tst" {
   engine                = "postgres"
   engine_version        = "12.6"
   instance_class        = "db.t2.micro"
-  name                  = "postgres_tst"
   username              = var.db_username
   password              = var.db_password
   parameter_group_name  = "default.postgres12"
 
   vpc_security_group_ids = [aws_security_group.tst_sg.id]
-
-  subnet_group_name = aws_db_subnet_group.subnet_group.name
 
   multi_az = false
 
