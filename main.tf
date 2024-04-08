@@ -2,15 +2,15 @@ provider "aws" {
   region = "us-east-1" 
 }
 
-resource "aws_vpc" "tst_vpc" {
+resource "aws_vpc" "tf_vpc" {
   cidr_block = "10.0.0.0/16"
 }
 
-resource "aws_security_group" "tst_sg" {
-  name        = "tst-sg"
+resource "aws_security_group" "tf_sg" {
+  name        = "tf_sg"
   description = "Security group for database"
 
-  vpc_id = aws_vpc.tst_vpc.id
+  vpc_id = aws_vpc.tf_vpc.id
 
   ingress {
     from_port   = 5432
@@ -28,19 +28,19 @@ resource "aws_security_group" "tst_sg" {
 }
 
 resource "aws_subnet" "subnet1" {
-  vpc_id            = aws_vpc.tst_vpc.id
+  vpc_id            = aws_vpc.tf_vpc.id
   cidr_block        = "10.0.1.0/24"
   availability_zone = "us-east-1a"
 }
 
 resource "aws_subnet" "subnet2" {
-  vpc_id            = aws_vpc.tst_vpc.id
+  vpc_id            = aws_vpc.tf_vpc.id
   cidr_block        = "10.0.2.0/24"
   availability_zone = "us-east-1b"
 }
 
 resource "aws_db_subnet_group" "subnet_group" {
-  name        = "subnet-group-tst"
+  name        = "subnet-group-tf"
   subnet_ids  = [aws_subnet.subnet1.id, aws_subnet.subnet2.id]
 }
 
@@ -63,7 +63,7 @@ resource "aws_db_instance" "postgres_tst" {
   password              = var.db_password
   parameter_group_name  = "default.postgres12"
 
-  vpc_security_group_ids = [aws_security_group.tst_sg.id]
+  vpc_security_group_ids = [aws_security_group.tf_sg.id]
 
   multi_az = true
 
