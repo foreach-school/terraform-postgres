@@ -1,5 +1,5 @@
 provider "aws" {
-  region = "us-east-1" 
+  region = "us-east-1"
 }
 
 resource "aws_vpc" "tf_vpc" {
@@ -40,26 +40,9 @@ resource "aws_subnet" "subnet2" {
 }
 
 resource "aws_db_subnet_group" "subnet_group" {
-  name        = "subnet-group-terraform"
-  subnet_ids  = [aws_subnet.subnet1.id, aws_subnet.subnet2.id]
+  name       = "subnet-group-terraform"
+  subnet_ids = [aws_subnet.subnet1.id, aws_subnet.subnet2.id]
 }
-
-/*resource "aws_db_parameter_group" "postgres_parameters" {
-  name   = "postgres-parameters"
-  family = "postgres14"
-
-  parameter {
-    name         = "max_connections"
-    value        = "100"
-    apply_method = "pending-reboot"
-  }
-
-  parameter {
-    name         = "shared_buffers"
-    value        = "512MB"
-    apply_method = "pending-reboot"
-  }
-}*/
 
 variable "db_password" {
   description = "Password for the database"
@@ -69,7 +52,7 @@ variable "db_username" {
   description = "Username for the database"
 }
 
-resource "aws_db_instance" "postgres_tst" {
+resource "aws_db_instance" "postgres_rds" {
   identifier            = "dbinstance"
   allocated_storage     = 20
   storage_type          = "gp2"
@@ -85,8 +68,48 @@ resource "aws_db_instance" "postgres_tst" {
 
   multi_az = false
 
-  tags = {
-    Name        = "MyDB"
-    Environment = "Development"
+}
+
+resource "aws_s3_bucket" "cdn_buckect" {
+  bucket = "cdn_buckect"
+  acl    = "private"
+}
+
+resource "aws_cloudfront_distribution" "cdn_distribution" {
+  origin {
+    domain_name = aws_s3_bucket.cdn_buckect.bucket_regional_domain_name
+    origin_id   = "S3Origin"
+  }
+
+  enabled             = true
+  is_ipv6_enabled     = true
+  default_root_object = "index.html"
+
+  default_cache_behavior {
+    allowed_methods  = ["GET", "HEAD", "OPTIONS"]
+    cached_methods   = ["GET", "HEAD", "OPTIONS"]
+    target_origin_id = "S3Origin"
+
+    forwarded_values {
+      query_string = false
+      cookies {
+        forward = "none"
+      }
+    }
+
+    viewer_protocol_policy = "redirect-to-https"
+    min_ttl                = 0
+    default_ttl            = 3600
+    max_ttl                = 86400
+  }
+
+  restrictions {
+    geo_restriction {
+      restriction_type = "none"
+    }
+  }
+
+  viewer_certificate {
+    cloudfront_default_certificate = true
   }
 }
