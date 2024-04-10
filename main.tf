@@ -70,14 +70,18 @@ resource "aws_db_instance" "postgres_rds" {
 
 }
 
-resource "aws_s3_bucket" "cdn_buckect" {
-  bucket = "cdn_buckect"
+variable "environment" {
+  description = "Environment (e.g., dev, staging, prod)"
+}
+
+resource "aws_s3_bucket" "cdn_bucket" {
+  bucket = "cdn-bucket-${aws_caller_identity.current.account_id}-${var.environment}"
   acl    = "private"
 }
 
 resource "aws_cloudfront_distribution" "cdn_distribution" {
   origin {
-    domain_name = aws_s3_bucket.cdn_buckect.bucket_regional_domain_name
+    domain_name = aws_s3_bucket.cdn_bucket.bucket_regional_domain_name
     origin_id   = "S3Origin"
   }
 
