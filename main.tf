@@ -4,6 +4,30 @@ provider "aws" {
 
 resource "aws_vpc" "tf_vpc" {
   cidr_block = "10.0.0.0/16"
+
+  # Adicionando a Gateway de Internet à VPC para conectividade com a Internet
+  enable_dns_support = true
+  enable_dns_hostnames = true
+
+  tags = {
+    Name = "tf_vpc"
+  }
+}
+
+# Associando uma Gateway de Internet à VPC
+resource "aws_internet_gateway" "tf_igw" {
+  vpc_id = aws_vpc.tf_vpc.id
+
+  tags = {
+    Name = "tf_igw"
+  }
+}
+
+# Criando uma rota para a Gateway de Internet na tabela de roteamento da VPC
+resource "aws_route" "internet_gateway" {
+  route_table_id         = aws_vpc.tf_vpc.main_route_table_id
+  destination_cidr_block = "0.0.0.0/0"
+  gateway_id             = aws_internet_gateway.tf_igw.id
 }
 
 resource "aws_security_group" "tf_sg" {
@@ -16,7 +40,7 @@ resource "aws_security_group" "tf_sg" {
     from_port   = 5432
     to_port     = 5432
     protocol    = "tcp"
-    cidr_blocks = ["0.0.0.0/0"]
+    cidr_blocks = ["0.0.0.0/0"]  # Permitindo tráfego da Internet
   }
 
   egress {
@@ -61,13 +85,13 @@ resource "aws_db_instance" "postgres_rds" {
   instance_class        = "db.t3.small"
   username              = var.db_username
   password              = var.db_password
-  parameter_group_name  = "postgres-parameters" #aws_db_parameter_group.postgres_parameters.name
+  publicly_accessible  = true
+  parameter_group_name  = "postgres-parameters"
 
   vpc_security_group_ids = [aws_security_group.tf_sg.id]
   db_subnet_group_name   = aws_db_subnet_group.subnet_group.name
 
   multi_az = false
-
 }
 
 variable "environment" {
